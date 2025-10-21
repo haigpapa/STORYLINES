@@ -1,4 +1,4 @@
-import { SearchResult, GoogleBooksVolume } from '../types';
+import type { SearchResult, GoogleBooksVolume } from '../types';
 
 const BASE_URL = 'https://www.googleapis.com/books/v1/volumes';
 

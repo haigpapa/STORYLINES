@@ -142,6 +142,8 @@ export interface GoogleBooksVolume {
     publishedDate?: string;
     description?: string;
     categories?: string[];
+    pageCount?: number;
+    language?: string;
     imageLinks?: {
       thumbnail?: string;
       small?: string;

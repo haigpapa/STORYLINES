@@ -1,5 +1,5 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { AIEnrichmentRequest, AIEnrichmentResponse, GraphNode } from '../types';
+import type { AIEnrichmentResponse, GraphNode } from '../types';
 
 export class GeminiService {
   private genAI: GoogleGenerativeAI | null = null;
@@ -136,7 +136,7 @@ Format your response as JSON:
 
       return text
         .split('\n')
-        .filter((line) => line.trim())
+        .filter((line: string) => line.trim())
         .slice(0, 5);
     } catch (error) {
       console.error('Gemini suggestions error:', error);

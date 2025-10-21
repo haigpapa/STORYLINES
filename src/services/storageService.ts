@@ -1,5 +1,6 @@
-import { openDB, DBSchema, IDBPDatabase } from 'idb';
-import { GraphNode, GraphEdge, SessionState } from '../types';
+import { openDB } from 'idb';
+import type { DBSchema, IDBPDatabase } from 'idb';
+import type { GraphNode, GraphEdge, SessionState } from '../types';
 
 interface StorylineDB extends DBSchema {
   nodes: {

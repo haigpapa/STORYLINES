@@ -1,5 +1,4 @@
-import React from 'react';
-import { NodeType } from '../../types';
+import type { NodeType } from '../../types';
 
 const nodeTypes: { type: NodeType; color: string; description: string }[] = [
   { type: 'author', color: '#8b5cf6', description: 'Writers and creators' },

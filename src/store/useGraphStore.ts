@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Graph, GraphNode, GraphEdge, ReadingListItem, Bookmark, JournalEntry } from '../types';
+import type { Graph, GraphNode, GraphEdge, ReadingListItem, Bookmark, JournalEntry } from '../types';
 
 interface GraphStore {
   // Graph state
@@ -66,7 +66,7 @@ interface GraphStore {
 
 export const useGraphStore = create<GraphStore>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       // Initial state
       graph: { nodes: [], edges: [] },
       selectedNodeId: null,

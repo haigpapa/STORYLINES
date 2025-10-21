@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { GraphNode, GraphEdge, NodeType, Graph } from '../types';
+import type { GraphNode, GraphEdge, NodeType } from '../types';
 
 export interface GraphEngineConfig {
   width: number;
@@ -164,12 +164,12 @@ export class GraphEngine {
     node.fy = event.y;
   }
 
-  dragEnded(node: GraphNode, event: any): void {
+  dragEnded(_node: GraphNode, event: any): void {
     if (!this.simulation) return;
     if (!event.active) this.simulation.alphaTarget(0);
     // Optionally release the node
-    // node.fx = null;
-    // node.fy = null;
+    // _node.fx = null;
+    // _node.fy = null;
   }
 
   // Apply clustering force for similar node types

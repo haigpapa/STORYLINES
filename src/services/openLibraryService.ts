@@ -1,11 +1,9 @@
-import { SearchResult, OpenLibraryWork } from '../types';
+import type { SearchResult, OpenLibraryWork } from '../types';
 
 const BASE_URL = 'https://openlibrary.org';
 
 export class OpenLibraryService {
   private cache: Map<string, any> = new Map();
-  private requestQueue: Promise<any>[] = [];
-  private readonly maxConcurrent = 3;
 
   async searchBooks(query: string, limit: number = 10): Promise<SearchResult[]> {
     const cacheKey = `search:${query}:${limit}`;

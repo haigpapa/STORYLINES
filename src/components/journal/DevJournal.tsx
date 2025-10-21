@@ -1,7 +1,5 @@
-import React from 'react';
 import { FileText, X, Info, Lightbulb, Code, Award } from 'lucide-react';
 import { useGraphStore } from '../../store/useGraphStore';
-import { JournalEntry } from '../../types';
 
 const iconMap = {
   info: Info,

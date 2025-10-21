@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   Search,
   FileText,
-  Settings,
   Download,
   Upload,
   Trash2,
   BookMarked,
+  X,
 } from 'lucide-react';
 import { useGraphStore } from '../../store/useGraphStore';
 import { storageService } from '../../services/storageService';

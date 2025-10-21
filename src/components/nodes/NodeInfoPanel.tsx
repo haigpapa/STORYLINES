@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { X, Sparkles, Book, Users, Tag, Loader, Bookmark, Plus } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { X, Sparkles, Book, Loader, Bookmark, Plus } from 'lucide-react';
 import { useGraphStore } from '../../store/useGraphStore';
 import { geminiService } from '../../services/geminiService';
 import { openLibraryService } from '../../services/openLibraryService';
-import { AIEnrichmentResponse, GraphNode, GraphEdge } from '../../types';
+import type { AIEnrichmentResponse, GraphNode, GraphEdge } from '../../types';
 
 export const NodeInfoPanel: React.FC = () => {
   const selectedNodeId = useGraphStore((state) => state.selectedNodeId);
@@ -107,7 +107,7 @@ export const NodeInfoPanel: React.FC = () => {
         const genres = selectedNode.metadata.genres || selectedNode.metadata.categories || [];
         const themes = selectedNode.metadata.subjects || selectedNode.metadata.themes || [];
 
-        genres.slice(0, 3).forEach((genre: string, index: number) => {
+        genres.slice(0, 3).forEach((genre: string) => {
           const genreNode: GraphNode = {
             id: `genre-${genre.toLowerCase().replace(/\s+/g, '-')}`,
             type: 'genre',
@@ -131,7 +131,7 @@ export const NodeInfoPanel: React.FC = () => {
           });
         });
 
-        themes.slice(0, 3).forEach((theme: string, index: number) => {
+        themes.slice(0, 3).forEach((theme: string) => {
           const themeNode: GraphNode = {
             id: `theme-${theme.toLowerCase().replace(/\s+/g, '-')}`,
             type: 'theme',
@@ -279,7 +279,7 @@ export const NodeInfoPanel: React.FC = () => {
             <p className="text-sm text-slate-400 line-clamp-4">
               {typeof selectedNode.metadata.description === 'string'
                 ? selectedNode.metadata.description
-                : selectedNode.metadata.description.value}
+                : (selectedNode.metadata.description as any)?.value || ''}
             </p>
           </div>
         )}

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { GraphCanvas } from './components/graph/GraphCanvas';
 import { SearchPanel } from './components/search/SearchPanel';
 import { NodeInfoPanel } from './components/nodes/NodeInfoPanel';

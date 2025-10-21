@@ -1,8 +1,8 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import { useRef, useEffect, useState, useCallback } from 'react';
 import * as d3 from 'd3';
 import { GraphEngine } from '../../lib/graphEngine';
 import { useGraphStore } from '../../store/useGraphStore';
-import { GraphNode } from '../../types';
+import type { GraphNode } from '../../types';
 
 interface GraphCanvasProps {
   onNodeClick?: (node: GraphNode) => void;
@@ -212,8 +212,8 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
       canvas.style.cursor = node ? 'pointer' : 'grab';
     };
 
-    const handleMouseDown = (event: MouseEvent) => {
-      const [x, y] = getMousePos(event);
+    const handleMouseDown = (_event: MouseEvent) => {
+      const [x, y] = getMousePos(_event);
       const node = engine.findNodeAt(x, y, graph.nodes);
 
       if (node) {
@@ -231,7 +231,7 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
       render();
     };
 
-    const handleMouseUp = (event: MouseEvent) => {
+    const handleMouseUp = (_event: MouseEvent) => {
       if (draggedNode) {
         engine.dragEnded(draggedNode, { active: false });
         draggedNode = null;

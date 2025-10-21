@@ -1,9 +1,9 @@
-import React, { useState, useCallback } from 'react';
-import { Search, Book, User, Tag, Sparkles, X, Loader } from 'lucide-react';
+import { useState, useCallback } from 'react';
+import { Search, Book, User, X, Loader } from 'lucide-react';
 import { openLibraryService } from '../../services/openLibraryService';
 import { googleBooksService } from '../../services/googleBooksService';
 import { useGraphStore } from '../../store/useGraphStore';
-import { SearchResult, GraphNode, NodeType } from '../../types';
+import type { SearchResult, GraphNode } from '../../types';
 
 export const SearchPanel: React.FC = () => {
   const [query, setQuery] = useState('');
