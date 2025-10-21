@@ -4,6 +4,12 @@
 
 Storylines is a production-grade web application that transforms the way you explore literature through interactive graph visualization, semantic search, and AI-powered contextual enrichment. Discover hidden connections between books, authors, genres, themes, and literary movements in an immersive, visually stunning constellation interface.
 
+## 🌐 Live Demo
+
+**[View Live Demo](https://haigpapa.github.io/storylines/)** *(Will be live after deployment)*
+
+> **Note:** To deploy, see [DEPLOYMENT.md](DEPLOYMENT.md) for complete instructions.
+
 ![Storylines Preview](https://via.placeholder.com/1200x600/0f172a/3b82f6?text=Storylines+Interactive+Graph)
 
 ## Features
