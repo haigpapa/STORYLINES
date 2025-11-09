@@ -8,7 +8,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
-import { GoogleGenerativeAI } from '@google/genai';
+import { GoogleGenAI } from '@google/genai';
 
 // Load environment variables
 dotenv.config();
@@ -17,7 +17,9 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 // Initialize Gemini AI - API key is now secure on server side
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const genAI = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY,
+});
 
 // Security middleware
 app.use(helmet({
@@ -90,31 +92,14 @@ app.post('/api/gemini/generate', geminiLimiter, async (req, res) => {
       return res.status(400).json({ error: 'Invalid model name' });
     }
 
-    const model = genAI.getGenerativeModel({ model: modelName });
+    // Generate content using Gemini API
+    const result = await genAI.models.generateContent({
+      model: modelName,
+      contents: prompt,
+    });
 
-    if (stream) {
-      // Streaming response
-      res.setHeader('Content-Type', 'text/event-stream');
-      res.setHeader('Cache-Control', 'no-cache');
-      res.setHeader('Connection', 'keep-alive');
-
-      const result = await model.generateContentStream(prompt);
-
-      for await (const chunk of result.stream) {
-        const text = chunk.text();
-        res.write(`data: ${JSON.stringify({ text })}\n\n`);
-      }
-
-      res.write('data: [DONE]\n\n');
-      res.end();
-    } else {
-      // Regular response
-      const result = await model.generateContent(prompt);
-      const response = result.response;
-      const text = response.text();
-
-      res.json({ text });
-    }
+    const text = result.text;
+    res.json({ text });
   } catch (error) {
     console.error('Gemini API error:', error);
 
@@ -166,17 +151,19 @@ app.post('/api/gemini/generate-json', geminiLimiter, async (req, res) => {
       return res.status(400).json({ error: 'Invalid model name' });
     }
 
-    const model = genAI.getGenerativeModel({
+    // Generate JSON content using Gemini API
+    const result = await genAI.models.generateContent({
       model: modelName,
-      generationConfig: {
-        responseMimeType: 'application/json',
-        responseSchema: schema,
+      contents: prompt,
+      config: {
+        generationConfig: {
+          responseMimeType: 'application/json',
+          responseSchema: schema,
+        },
       },
     });
 
-    const result = await model.generateContent(prompt);
-    const response = result.response;
-    const text = response.text();
+    const text = result.text;
 
     // Parse JSON response
     try {
