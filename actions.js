@@ -7,6 +7,8 @@ import {queryLlm} from './llm'
 import {queryPrompt, findConnectionPrompt, createExpansionPrompt, createSummaryPrompt, createBookGridPrompt} from './prompts'
 import * as THREE from 'three'
 import { searchLiterary, findApiKeyForNode, ensureBookImage, ensureAuthorImage, findBookForGrid } from './libraryApi';
+import { validateSearchQuery, sanitizeInput, validateNodeId } from './utils/validation';
+import { searchRateLimiter, expansionRateLimiter } from './utils/rateLimiter';
 
 const get = useStore.getState
 const set = useStore.setState
@@ -234,12 +236,30 @@ export const init = async () => {
 };
 
 export const sendQuery = async query => {
-  const currentMode = get().visualizationMode;
-  if (currentMode === 'bookgrid') {
-    seedGrid(query);
+  // Validate and sanitize input
+  const validation = validateSearchQuery(query);
+  if (!validation.valid) {
+    set(state => { state.caption = validation.error });
     return;
   }
-  
+
+  // Check rate limit
+  const rateLimitCheck = searchRateLimiter.check();
+  if (!rateLimitCheck.allowed) {
+    set(state => {
+      state.caption = `Too many searches. Please wait ${rateLimitCheck.retryAfter} seconds.`;
+    });
+    return;
+  }
+
+  const sanitizedQuery = sanitizeInput(query);
+
+  const currentMode = get().visualizationMode;
+  if (currentMode === 'bookgrid') {
+    seedGrid(sanitizedQuery);
+    return;
+  }
+
   resetConnectionState();
   const queryTimestamp = Date.now();
   const isGrounded = get().isGroundedSearchActive;
@@ -247,7 +267,7 @@ export const sendQuery = async query => {
   set(state => {
     state.isFetching = true;
     state.selectedNode = null;
-    state.caption = isGrounded ? `Searching the web for "${query}"...` : `Searching for "${query}"...`;
+    state.caption = isGrounded ? `Searching the web for "${sanitizedQuery}"...` : `Searching for "${sanitizedQuery}"...`;
     state.latestQueryTimestamp = queryTimestamp;
     state.areJourneySuggestionsVisible = false;
     state.activePanel = 'help';
@@ -258,7 +278,7 @@ export const sendQuery = async query => {
     if (isGrounded) {
         const response = await queryLlm({
             model: 'gemini-2.5-flash',
-            prompt: queryPrompt(query),
+            prompt: queryPrompt(sanitizedQuery),
             config: { tools: [{googleSearch: {}}] }
         });
         const groundingSources = response.candidates?.[0]?.groundingMetadata?.groundingChunks;
@@ -266,14 +286,14 @@ export const sendQuery = async query => {
         if (groundingSources) resJ.groundingSources = groundingSources;
         ({ primaryNodeId } = await addNewDataToGraph(resJ, queryTimestamp));
     } else {
-        const apiData = await searchLiterary(query);
+        const apiData = await searchLiterary(sanitizedQuery);
         if (apiData && apiData.nodes.length > 0) {
             ({ primaryNodeId } = await addNewDataToGraph(apiData, queryTimestamp));
             set(state => { state.caption = apiData.commentary });
         } else {
             set(state => { state.caption = 'No results from public libraries, asking AI...' });
             const response = await queryLlm({
-                prompt: queryPrompt(query),
+                prompt: queryPrompt(sanitizedQuery),
                 config: { responseMimeType: 'application/json' }
             });
             const resJ = parseLlmJson(response.text);
@@ -284,8 +304,13 @@ export const sendQuery = async query => {
     if (primaryNodeId) set(state => { state.selectedNode = primaryNodeId; });
 
   } catch (e) {
-    console.error(e)
-    set(state => { state.caption = 'Sorry, I had trouble with that request.' })
+    console.error('Search query error:', e)
+    const errorMessage = e.message?.includes('quota')
+      ? 'API quota exceeded. Please try again later.'
+      : e.message?.includes('network')
+      ? 'Network error. Please check your connection.'
+      : 'Sorry, I had trouble with that request.';
+    set(state => { state.caption = errorMessage })
   } finally {
     set(state => { state.isFetching = false })
     setTimeout(() => {
@@ -447,8 +472,28 @@ export const findConnection = async (startNodeId, endNodeId) => {
 
 export const expandNode = async (nodeId) => {
     if (get().visualizationMode === 'bookgrid') return; // Don't expand in book grid mode
+
+    // Validate node ID
+    const validation = validateNodeId(nodeId);
+    if (!validation.valid) {
+        console.error('Invalid node ID:', validation.error);
+        return;
+    }
+
     const nodeToExpand = get().nodes[nodeId];
-    if (!nodeToExpand) return;
+    if (!nodeToExpand) {
+        console.error('Node not found:', nodeId);
+        return;
+    }
+
+    // Check rate limit
+    const rateLimitCheck = expansionRateLimiter.check();
+    if (!rateLimitCheck.allowed) {
+        set(state => {
+            state.caption = `Too many expansions. Please wait ${rateLimitCheck.retryAfter} seconds.`;
+        });
+        return;
+    }
 
     const queryTimestamp = Date.now();
 
@@ -471,9 +516,12 @@ export const expandNode = async (nodeId) => {
         await addNewDataToGraph(resJ, queryTimestamp, nodeToExpand.position);
 
     } catch (e) {
-        console.error(e);
+        console.error('Node expansion error:', e);
+        const errorMessage = e.message?.includes('quota')
+            ? 'API quota exceeded. Please try again later.'
+            : 'Sorry, I had trouble expanding on that.';
         set(state => {
-            state.caption = 'Sorry, I had trouble expanding on that.';
+            state.caption = errorMessage;
         });
     } finally {
         set(state => {
