@@ -58,6 +58,15 @@ Pre-built thematic explorations:
 - Loading skeletons for better UX
 - Touch-optimized interface for mobile devices
 
+#### 📊 **Analytics & Insights**
+- Comprehensive graph analytics dashboard
+- Real-time performance monitoring
+- Node statistics and breakdowns
+- Connectivity metrics and cluster analysis
+- Temporal distribution analysis
+- Content quality metrics
+- Export analytics as CSV
+
 ---
 
 ## 🚀 Getting Started
@@ -154,6 +163,26 @@ npm run preview
 - Click the sparkle icon to reveal journey suggestions
 - Select a theme to load a pre-curated literary universe
 - Great for discovery and education
+
+#### Graph Analytics 📊
+Access comprehensive analytics from the toolbar:
+- **Overview**: Total nodes, connections, density
+- **Node Breakdown**: Distribution by type (books, authors, themes)
+- **Connectivity**: Clusters, isolated nodes, average degree
+- **Most Connected**: Top nodes by connection count
+- **Temporal Analysis**: Books per decade, time span
+- **Content Quality**: Images and descriptions coverage
+- **Export**: Download analytics as CSV
+
+#### Performance Monitoring ⚡
+Real-time performance dashboard with:
+- **FPS Tracking**: Monitor frame rate in real-time
+- **Render Time**: Track visualization performance
+- **Memory Usage**: Monitor browser memory consumption
+- **Graph Metrics**: Node/edge count and update times
+- **API Performance**: Track API call success rate and response times
+- **Performance Grade**: Overall system health score with recommendations
+- **Compact Mode**: Minimized view that expands on demand
 
 ---
 
@@ -377,11 +406,20 @@ In `GraphViz.jsx`, tune the force-directed layout parameters:
 - [x] Storage management and monitoring
 - [x] Comprehensive architecture documentation
 
-### Next Phase: Enhancement & Optimization 🚧
-- [ ] Advanced filtering options (multiple criteria, saved filters)
-- [ ] Graph analytics and statistics
-- [ ] Performance monitoring
-- [ ] Accessibility improvements (ARIA, screen readers)
+### Phase 5: Analytics, Performance & Accessibility ✅
+- [x] Graph analytics with comprehensive statistics
+- [x] Real-time performance monitoring dashboard
+- [x] Performance grading and recommendations
+- [x] Advanced filtering utilities (multi-criteria support)
+- [x] ARIA labels and screen reader support
+- [x] Keyboard navigation enhancements
+- [x] Export analytics as CSV
+
+### Next Phase: Additional Enhancements 🚧
+- [ ] Saved filter presets and management UI
+- [ ] Graph clustering visualization
+- [ ] Advanced search with filters
+- [ ] Reading progress tracking
 
 ### Future Features 🔮
 - [ ] User accounts and saved explorations

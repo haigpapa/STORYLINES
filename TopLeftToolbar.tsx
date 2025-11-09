@@ -6,6 +6,8 @@ import { useState } from "react";
 import c from "clsx";
 import useStore from "./store";
 import SettingsPanel from "./components/SettingsPanel";
+import AnalyticsPanel from "./components/AnalyticsPanel";
+import PerformanceDashboard from "./components/PerformanceDashboard";
 import {
     setActivePanel,
     toggleConnectionMode,
@@ -17,6 +19,8 @@ import {
 const TopLeftToolbar: React.FC = () => {
     const [isExpanded, setIsExpanded] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
+    const [showAnalytics, setShowAnalytics] = useState(false);
+    const [showPerformance, setShowPerformance] = useState(false);
 
     const activePanel = useStore(s => s.activePanel);
     const selectedNode = useStore(s => s.selectedNode);
@@ -35,6 +39,13 @@ const TopLeftToolbar: React.FC = () => {
                     onClick={() => setActivePanel('help')}
                 >
                     <span className="icon">public</span>
+                </button>
+                <button
+                    className={c("toolbar-button", { active: showAnalytics })}
+                    title="Analytics"
+                    onClick={() => setShowAnalytics(prev => !prev)}
+                >
+                    <span className="icon">bar_chart</span>
                 </button>
                 <button
                     className={c("toolbar-button", { active: showSettings })}
@@ -100,12 +111,19 @@ const TopLeftToolbar: React.FC = () => {
                 >
                     <span className="icon">calendar_month</span>
                 </button>
-                 <button
+                     <button
                     title="Reset Universe"
                     onClick={toggleResetPanel}
                     className={c('toolbar-button', { active: isResetPanelVisible })}
                 >
                     <span className="icon">refresh</span>
+                </button>
+                <button
+                    title="Performance Monitor"
+                    onClick={() => setShowPerformance(prev => !prev)}
+                    className={c('toolbar-button', { active: showPerformance })}
+                >
+                    <span className="icon">speed</span>
                 </button>
             </div>
         </aside>
@@ -119,6 +137,18 @@ const TopLeftToolbar: React.FC = () => {
                 <SettingsPanel onClose={() => setShowSettings(false)} />
             </>
         )}
+
+        {showAnalytics && (
+            <>
+                <div
+                    className="settings-overlay"
+                    onClick={() => setShowAnalytics(false)}
+                />
+                <AnalyticsPanel onClose={() => setShowAnalytics(false)} />
+            </>
+        )}
+
+        {showPerformance && <PerformanceDashboard compact={true} />}
         </>
     );
 };
