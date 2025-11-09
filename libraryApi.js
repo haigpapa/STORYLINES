@@ -5,6 +5,7 @@
 import { GoogleGenAI } from '@google/genai';
 import { queryLlm, retryWithBackoff } from './llm';
 import { extractThemesPrompt } from './prompts';
+import { apiCache } from './utils/cache';
 
 const ai = new GoogleGenAI({
     apiKey: process.env.API_KEY
@@ -12,7 +13,7 @@ const ai = new GoogleGenAI({
 
 // --- API Throttling for Open Library ---
 let lastApiCallTimestamp = 0;
-const API_CALL_INTERVAL = 100; // ms between calls
+const API_CALL_INTERVAL = 200; // ms between calls (increased from 100 for safety)
 
 async function throttledFetch(url, options) {
     const now = Date.now();
@@ -27,14 +28,44 @@ async function throttledFetch(url, options) {
     return fetch(url, options);
 }
 
-// Centralized fetch helper using the new throttler
+// Centralized fetch helper using the new throttler with caching
 async function fetchOpenLibrary(path) {
-    const url = path.startsWith('http') ? path : `https://openlibrary.org${path}`;
-    const response = await throttledFetch(url, { referrerPolicy: 'no-referrer' });
-    if (!response.ok) {
-        throw new Error(`Open Library request failed for ${path} with status: ${response.status}`);
+    // Check cache first
+    const cacheKey = `openlib:${path}`;
+    const cached = apiCache.get(cacheKey);
+    if (cached) {
+        return cached;
     }
-    return response.json();
+
+    const url = path.startsWith('http') ? path : `https://openlibrary.org${path}`;
+
+    try {
+        const response = await throttledFetch(url, { referrerPolicy: 'no-referrer' });
+        if (!response.ok) {
+            throw new Error(`Open Library request failed for ${path} with status: ${response.status}`);
+        }
+        const data = await response.json();
+
+        // Cache the successful response
+        apiCache.set(cacheKey, data);
+
+        return data;
+    } catch (error) {
+        // Retry logic for network errors
+        if (error.message?.includes('network') || error.message?.includes('fetch')) {
+            console.warn(`Network error for ${path}, retrying...`);
+            // Wait and retry once
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            const response = await throttledFetch(url, { referrerPolicy: 'no-referrer' });
+            if (!response.ok) {
+                throw new Error(`Open Library request failed for ${path} with status: ${response.status}`);
+            }
+            const data = await response.json();
+            apiCache.set(cacheKey, data);
+            return data;
+        }
+        throw error;
+    }
 }
 
 /**
