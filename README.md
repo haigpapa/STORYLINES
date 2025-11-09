@@ -8,7 +8,7 @@ An AI-powered interactive 3D visualization engine that maps the complex relation
 [![React](https://img.shields.io/badge/React-19.1.0-61dafb.svg)](https://reactjs.org/)
 [![Three.js](https://img.shields.io/badge/Three.js-0.176.0-000000.svg)](https://threejs.org/)
 
-[Live Demo](#) | [Features](#features) | [Getting Started](#getting-started) | [Documentation](#documentation)
+[Live Demo](#) | [Features](#features) | [Getting Started](#getting-started) | [Architecture](ARCHITECTURE.md) | [Documentation](#documentation)
 
 </div>
 
@@ -370,12 +370,18 @@ In `GraphViz.jsx`, tune the force-directed layout parameters:
 - [x] Comprehensive mobile responsiveness
 - [x] Touch-optimized interface
 
-### Next Phase: Advanced Features 🚧
-- [ ] Data persistence (localStorage)
-- [ ] Import graphs from JSON
-- [ ] User preferences/settings panel
-- [ ] Advanced filtering options
+### Phase 4: Advanced Features & Documentation ✅
+- [x] Data persistence (localStorage with auto-save)
+- [x] Import graphs from JSON files
+- [x] User preferences/settings panel
+- [x] Storage management and monitoring
+- [x] Comprehensive architecture documentation
+
+### Next Phase: Enhancement & Optimization 🚧
+- [ ] Advanced filtering options (multiple criteria, saved filters)
 - [ ] Graph analytics and statistics
+- [ ] Performance monitoring
+- [ ] Accessibility improvements (ARIA, screen readers)
 
 ### Future Features 🔮
 - [ ] User accounts and saved explorations
