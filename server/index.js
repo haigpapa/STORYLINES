@@ -9,12 +9,19 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import { GoogleGenAI } from '@google/genai';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+// ESM __dirname equivalent
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // Load environment variables
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
 // Initialize Gemini AI - API key is now secure on server side
 const genAI = new GoogleGenAI({
@@ -197,6 +204,34 @@ app.post('/api/gemini/generate-json', geminiLimiter, async (req, res) => {
   }
 });
 
+// Serve static files in production
+if (IS_PRODUCTION) {
+  const distPath = join(__dirname, '..', 'dist');
+
+  // Serve static assets
+  app.use(express.static(distPath));
+
+  // SPA fallback - serve index.html for all non-API routes
+  app.use((req, res, next) => {
+    // Don't serve index.html for API routes
+    if (req.path.startsWith('/api/')) {
+      return next();
+    }
+    res.sendFile(join(distPath, 'index.html'));
+  });
+}
+
+// 404 handler for API routes
+app.use((req, res, next) => {
+  if (req.path.startsWith('/api/')) {
+    return res.status(404).json({ error: 'API endpoint not found' });
+  }
+  if (!IS_PRODUCTION) {
+    return res.status(404).json({ error: 'Not found - frontend should run on separate port in development' });
+  }
+  next();
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error('Unhandled error:', err);
@@ -204,11 +239,6 @@ app.use((err, req, res, next) => {
     error: 'Internal server error',
     message: process.env.NODE_ENV === 'development' ? err.message : undefined,
   });
-});
-
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({ error: 'Endpoint not found' });
 });
 
 // Start server
