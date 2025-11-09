@@ -10,6 +10,8 @@ import useStore from "./store";
 import SidePanel from "./SidePanel";
 import TopLeftToolbar from "./TopLeftToolbar";
 import Intro from "./Intro";
+import GraphLoadingSkeleton from "./components/GraphLoadingSkeleton";
+import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 
 import {
   sendQuery,
@@ -23,7 +25,7 @@ import {
   toggleGroundedSearch,
 } from "./actions";
 
-const JourneySuggestions = () => (
+const JourneySuggestions: React.FC = () => (
     <div className="journey-suggestions">
       <button onClick={() => startJourney('Magical Realism')}>Magical Realism</button>
       <button onClick={() => startJourney('Experimental Fiction')}>Experimental Fiction</button>
@@ -32,15 +34,15 @@ const JourneySuggestions = () => (
       <button onClick={() => startJourney('The Beat Generation')}>The Beat Generation</button>
     </div>
   );
-  
-const TimelineFilter = () => {
+
+const TimelineFilter: React.FC = () => {
     const isTimelineActive = useStore(state => state.isTimelineActive);
     const nodes = useStore(state => state.nodes);
 
     const { min, max } = useMemo(() => {
         const years = Object.values(nodes)
             .map(n => n.publicationYear)
-            .filter(Boolean);
+            .filter(Boolean) as number[];
         if (years.length < 2) return { min: 1500, max: new Date().getFullYear() };
         const minYear = Math.min(...years);
         const maxYear = Math.max(...years);
@@ -50,16 +52,16 @@ const TimelineFilter = () => {
     const [startYear, setStartYear] = useState(min);
     const [endYear, setEndYear] = useState(max);
 
-    const handleStartChange = (e) => {
+    const handleStartChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newStart = Math.min(Number(e.target.value), endYear - 1);
         setStartYear(newStart);
     };
 
-    const handleEndChange = (e) => {
+    const handleEndChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newEnd = Math.max(Number(e.target.value), startYear + 1);
         setEndYear(newEnd);
     };
-    
+
     // Update global state when sliders stop moving
     const handleMouseUp = () => {
         setTimelineRange({ start: startYear, end: endYear });
@@ -115,7 +117,7 @@ const TimelineFilter = () => {
     );
 };
 
-const ResetPanel = () => {
+const ResetPanel: React.FC = () => {
     const isResetPanelVisible = useStore(state => state.isResetPanelVisible);
     if (!isResetPanelVisible) return null;
     return (
@@ -140,19 +142,23 @@ export default function App() {
   const visualizationMode = useStore(s => s.visualizationMode);
   const isGridLoading = useStore(s => s.bookGrid.isLoading);
   const isTimelineActive = useStore(s => s.isTimelineActive);
+  const nodes = useStore(s => s.nodes);
 
 
   const [value, setValue] = useState("");
-  const inputRef = useRef(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Enable keyboard shortcuts
+  useKeyboardShortcuts({ inputRef });
 
   const handleSendQuery = () => {
     if (value) {
       sendQuery(value);
       setValue("");
-      inputRef.current.blur();
+      inputRef.current?.blur();
     }
   };
-  
+
   if (!didInit) {
     return (
         <main>
@@ -167,16 +173,24 @@ export default function App() {
 
   const isGraphMode = visualizationMode === 'graph';
   const showTimeline = isGraphMode && isTimelineActive;
+  const showGraphSkeleton = isGraphMode && isFetching && Object.keys(nodes).length < 3;
 
   return (
     <main className="app-loaded">
       <TopLeftToolbar />
-      
-      {isGraphMode ? <GraphViz /> : <BookGridViz />}
 
-      <div 
+      {isGraphMode ? (
+        <>
+          <GraphViz />
+          {showGraphSkeleton && <GraphLoadingSkeleton />}
+        </>
+      ) : (
+        <BookGridViz />
+      )}
+
+      <div
         className={c('panel-overlay', { active: activePanel })}
-        onClick={() => setActivePanel(null)} 
+        onClick={() => setActivePanel(null)}
       />
       <SidePanel />
 
@@ -184,7 +198,7 @@ export default function App() {
         {areJourneySuggestionsVisible && isGraphMode && <JourneySuggestions />}
         <ResetPanel />
         {showTimeline && <TimelineFilter />}
-        
+
         <div className="input-wrapper">
           <div className="command-pill">
             {isGraphMode && (
@@ -233,7 +247,7 @@ export default function App() {
             >
                 <span className="icon">zoom_out_map</span>
             </button>
-            
+
             {!(isFetching || isGridLoading) && value.length > 0 && (
                 <button
                   onClick={handleSendQuery}

@@ -2,14 +2,31 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
 */
-import { Component } from 'react';
+import { Component, ReactNode, ErrorInfo } from 'react';
+
+interface ErrorBoundaryProps {
+  children: ReactNode;
+  fallback?: (props: FallbackProps) => ReactNode;
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean;
+  error: Error | null;
+  errorInfo: ErrorInfo | null;
+}
+
+interface FallbackProps {
+  error: Error | null;
+  errorInfo: ErrorInfo | null;
+  resetError: () => void;
+}
 
 /**
  * Error Boundary component that catches JavaScript errors anywhere in the child component tree,
  * logs those errors, and displays a fallback UI instead of the component tree that crashed.
  */
-class ErrorBoundary extends Component {
-  constructor(props) {
+class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = {
       hasError: false,
@@ -18,12 +35,12 @@ class ErrorBoundary extends Component {
     };
   }
 
-  static getDerivedStateFromError(error) {
+  static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
     // Update state so the next render will show the fallback UI
     return { hasError: true };
   }
 
-  componentDidCatch(error, errorInfo) {
+  componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     // Log error details for debugging
     console.error('Error caught by boundary:', error, errorInfo);
 
@@ -36,7 +53,7 @@ class ErrorBoundary extends Component {
     // logErrorToService(error, errorInfo);
   }
 
-  handleReset = () => {
+  handleReset = (): void => {
     this.setState({
       hasError: false,
       error: null,
@@ -44,7 +61,7 @@ class ErrorBoundary extends Component {
     });
   };
 
-  render() {
+  render(): ReactNode {
     if (this.state.hasError) {
       // Custom fallback UI
       if (this.props.fallback) {

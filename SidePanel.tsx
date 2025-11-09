@@ -3,23 +3,25 @@
  * SPDX-License-Identifier: Apache-2.0
 */
 import c from "clsx";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import useStore from "./store";
 import { setActivePanel, focusNode, toggleNodeTypeFilter, generateAiSummary, addBookToGrid } from "./actions";
+import type { Node, NodeType } from "./types";
+import { exportGraphAsJSON, copyGraphToClipboard, shareGraph, generateGraphSummary } from "./utils/export";
 
-const nodeIcons = {
+const nodeIcons: Record<NodeType, string> = {
   book: "menu_book",
   author: "person",
   theme: "lightbulb",
 };
 
-const nodeTypeColors = {
+const nodeTypeColors: Record<NodeType, string> = {
   book: '#0891b2',
   author: '#f59e0b',
   theme: '#2dd4bf',
 };
 
-const DetailsContent = () => {
+const DetailsContent: React.FC = () => {
     const selectedNodeId = useStore(s => s.selectedNode);
     const nodes = useStore(s => s.nodes);
     const isFetching = useStore(s => s.isFetching);
@@ -28,8 +30,8 @@ const DetailsContent = () => {
 
     const isBookInGrid = useMemo(() => {
         if (!selectedNode || selectedNode.type !== 'book') return false;
-        return bookGridSlots.some(slot => 
-            (slot.bookData?.apiKey && slot.bookData.apiKey === selectedNode.api_key) || 
+        return bookGridSlots.some(slot =>
+            (slot.bookData?.apiKey && slot.bookData.apiKey === selectedNode.api_key) ||
             slot.bookData?.title === selectedNode.label
         );
     }, [selectedNode, bookGridSlots]);
@@ -41,7 +43,7 @@ const DetailsContent = () => {
           </div>
         );
     }
-    
+
     const handleGenerateClick = () => {
         if (selectedNode && !isFetching) {
             generateAiSummary(selectedNode.id);
@@ -72,10 +74,10 @@ const DetailsContent = () => {
           <p className="node-series">Part of: {selectedNode.series}</p>
         )}
         <p className="node-description">{selectedNode.description}</p>
-        
+
         {selectedNode.type === 'book' && (
             <div className="add-to-grid-section">
-                <button 
+                <button
                     className="add-to-grid-button"
                     onClick={handleAddBookToGrid}
                     disabled={isBookInGrid}
@@ -85,7 +87,7 @@ const DetailsContent = () => {
                 </button>
             </div>
         )}
-        
+
         {/* --- New AI Summary Section --- */}
         <div className="ai-summary-section">
             {!selectedNode.aiSummary && (
@@ -94,7 +96,7 @@ const DetailsContent = () => {
                     Generate AI Analysis
                 </button>
             )}
-            
+
             {selectedNode.aiSummary === 'loading...' && (
                  <div className="ai-summary-loading">
                     <img
@@ -105,7 +107,7 @@ const DetailsContent = () => {
                     <span>Generating analysis...</span>
                  </div>
             )}
-            
+
             {selectedNode.aiSummary && typeof selectedNode.aiSummary === 'object' && !selectedNode.aiSummary.error && (
                 <div className="ai-summary-content">
                     <h4>Summary</h4>
@@ -115,7 +117,7 @@ const DetailsContent = () => {
                 </div>
             )}
 
-            {selectedNode.aiSummary?.error && (
+            {selectedNode.aiSummary && typeof selectedNode.aiSummary === 'object' && selectedNode.aiSummary.error && (
                 <p className="ai-summary-error">{selectedNode.aiSummary.error}</p>
             )}
         </div>
@@ -139,9 +141,9 @@ const DetailsContent = () => {
     );
 };
 
-const FiltersContent = () => {
+const FiltersContent: React.FC = () => {
     const nodeFilters = useStore(s => s.nodeFilters);
-    const filterTypes = Object.keys(nodeFilters);
+    const filterTypes = Object.keys(nodeFilters) as NodeType[];
 
     return (
         <div className="filters">
@@ -163,18 +165,33 @@ const FiltersContent = () => {
     );
 }
 
-const NodesContent = () => {
+const NodesContent: React.FC = () => {
     const nodes = useStore(s => s.nodes);
     const nodeFilters = useStore(s => s.nodeFilters);
     const visualizationMode = useStore(s => s.visualizationMode);
+    const [searchQuery, setSearchQuery] = useState('');
 
-    const filteredNodes = Object.values(nodes).filter(node => nodeFilters[node.type]);
+    const filteredNodes = Object.values(nodes).filter(node => {
+        // Filter by type
+        if (!nodeFilters[node.type]) return false;
+
+        // Filter by search query
+        if (searchQuery.trim()) {
+            const query = searchQuery.toLowerCase();
+            return node.label.toLowerCase().includes(query) ||
+                   node.description?.toLowerCase().includes(query) ||
+                   node.series?.toLowerCase().includes(query);
+        }
+
+        return true;
+    });
+
     const sortedNodes = filteredNodes.sort((a, b) => (a.label || '').localeCompare(b.label || ''));
-    
+
     const totalNodeCount = Object.keys(nodes).length;
     const visibleNodeCount = sortedNodes.length;
 
-    const handleNodeClick = (node) => {
+    const handleNodeClick = (node: Node) => {
         if (visualizationMode === 'graph') {
             focusNode(node.id);
             setActivePanel('details');
@@ -185,6 +202,25 @@ const NodesContent = () => {
         <>
             <h2>Graph Nodes ({visibleNodeCount} / {totalNodeCount})</h2>
             <div className="panel-content list-panel">
+                <div className="node-search">
+                    <span className="icon">search</span>
+                    <input
+                        type="text"
+                        placeholder="Search nodes..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="node-search-input"
+                    />
+                    {searchQuery && (
+                        <button
+                            className="clear-search"
+                            onClick={() => setSearchQuery('')}
+                            aria-label="Clear search"
+                        >
+                            <span className="icon">close</span>
+                        </button>
+                    )}
+                </div>
                 <ul>
                     {sortedNodes.map((node) => (
                     <li key={node.id} onClick={() => handleNodeClick(node)}>
@@ -196,7 +232,7 @@ const NodesContent = () => {
                         </p>
                     </li>
                     ))}
-                    {totalNodeCount > 0 && visibleNodeCount === 0 && <li>No nodes match filters.</li>}
+                    {totalNodeCount > 0 && visibleNodeCount === 0 && <li>No nodes match {searchQuery ? 'search' : 'filters'}.</li>}
                     {totalNodeCount === 0 && <li>Search to begin exploring.</li>}
                 </ul>
             </div>
@@ -204,12 +240,14 @@ const NodesContent = () => {
     );
 }
 
-const HelpContent = () => {
+const HelpContent: React.FC = () => {
     const caption = useStore(s => s.caption);
     const connectionMode = useStore(s => s.connectionMode);
     const connectionStartNode = useStore(s => s.connectionStartNode);
     const nodes = useStore(s => s.nodes);
+    const edges = useStore(s => s.edges);
     const visualizationMode = useStore(s => s.visualizationMode);
+    const [copyMessage, setCopyMessage] = useState<string | null>(null);
 
     const getCaption = () => {
         if (connectionMode === 'selectingStart') return 'Select a starting node to find a path.';
@@ -237,6 +275,94 @@ const HelpContent = () => {
                 <p>
                     {getHelpText()}
                 </p>
+
+                <div className="keyboard-shortcuts">
+                    <h4>Keyboard Shortcuts</h4>
+                    <div className="shortcut-grid">
+                        <div className="shortcut-row">
+                            <kbd>/</kbd>
+                            <span>Focus search</span>
+                        </div>
+                        <div className="shortcut-row">
+                            <kbd>Esc</kbd>
+                            <span>Close panels</span>
+                        </div>
+                        <div className="shortcut-row">
+                            <kbd>?</kbd>
+                            <span>Show help</span>
+                        </div>
+                        <div className="shortcut-row">
+                            <kbd>d</kbd>
+                            <span>Show details</span>
+                        </div>
+                        <div className="shortcut-row">
+                            <kbd>f</kbd>
+                            <span>Show filters</span>
+                        </div>
+                        <div className="shortcut-row">
+                            <kbd>n</kbd>
+                            <span>Show nodes</span>
+                        </div>
+                        <div className="shortcut-row">
+                            <kbd>j</kbd>
+                            <span>Toggle journeys</span>
+                        </div>
+                        <div className="shortcut-row">
+                            <kbd>r</kbd>
+                            <span>Reset camera</span>
+                        </div>
+                        <div className="shortcut-row">
+                            <kbd>←→↑↓</kbd>
+                            <span>Navigate nodes</span>
+                        </div>
+                    </div>
+                </div>
+
+                {Object.keys(nodes).length > 0 && (
+                    <div className="export-section">
+                        <h4>Export & Share</h4>
+                        <div className="export-buttons">
+                            <button
+                                className="export-button"
+                                onClick={() => exportGraphAsJSON(nodes, edges)}
+                                title="Download graph as JSON"
+                            >
+                                <span className="icon">download</span>
+                                Download JSON
+                            </button>
+                            <button
+                                className="export-button"
+                                onClick={async () => {
+                                    const success = await copyGraphToClipboard(nodes, edges);
+                                    if (success) {
+                                        setCopyMessage('Copied to clipboard!');
+                                        setTimeout(() => setCopyMessage(null), 2000);
+                                    } else {
+                                        setCopyMessage('Failed to copy');
+                                        setTimeout(() => setCopyMessage(null), 2000);
+                                    }
+                                }}
+                                title="Copy graph data to clipboard"
+                            >
+                                <span className="icon">content_copy</span>
+                                Copy Data
+                            </button>
+                            {navigator.share && (
+                                <button
+                                    className="export-button"
+                                    onClick={() => shareGraph(nodes, edges)}
+                                    title="Share via system dialog"
+                                >
+                                    <span className="icon">share</span>
+                                    Share
+                                </button>
+                            )}
+                        </div>
+                        {copyMessage && (
+                            <div className="copy-message">{copyMessage}</div>
+                        )}
+                    </div>
+                )}
             </div>
         </>
     )
@@ -252,7 +378,7 @@ const panelConfig = {
 export default function SidePanel() {
   const activePanel = useStore(s => s.activePanel);
 
-  const { title, content } = panelConfig[activePanel] || {};
+  const { title, content } = panelConfig[activePanel || 'help'] || {};
 
   return (
     <aside className={c("side-panel", { open: !!activePanel })}>

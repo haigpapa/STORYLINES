@@ -8,7 +8,7 @@ An AI-powered interactive 3D visualization engine that maps the complex relation
 [![React](https://img.shields.io/badge/React-19.1.0-61dafb.svg)](https://reactjs.org/)
 [![Three.js](https://img.shields.io/badge/Three.js-0.176.0-000000.svg)](https://threejs.org/)
 
-[Live Demo](#) | [Features](#features) | [Getting Started](#getting-started) | [Documentation](#documentation)
+[Live Demo](#) | [Features](#features) | [Getting Started](#getting-started) | [Architecture](ARCHITECTURE.md) | [Documentation](#documentation)
 
 </div>
 
@@ -51,7 +51,28 @@ Pre-built thematic explorations:
 - Physics-based 3D navigation with intuitive controls
 - Node filtering by type (books, authors, themes)
 - Visual connection paths with animated highlights
-- Responsive design for desktop and tablet
+- Comprehensive keyboard shortcuts for power users
+- Export & share graphs (JSON, clipboard, native share)
+- Node search with real-time filtering
+- Fully responsive design (desktop, tablet, mobile)
+- Loading skeletons for better UX
+- Touch-optimized interface for mobile devices
+
+#### 📊 **Analytics & Insights**
+- Comprehensive graph analytics dashboard
+- Real-time performance monitoring with FPS tracking
+- Node statistics and breakdowns
+- Connectivity metrics and cluster analysis
+- Temporal distribution analysis
+- Content quality metrics
+- Export analytics as CSV
+- Advanced filtering with saved presets
+- Multi-criteria filtering (type, year, series, description)
+- Graph clustering visualization (connected components, series, types)
+- Advanced search with real-time filtering
+- Reading progress tracking with statistics
+- Yearly reading goals and streaks
+- Book ratings and personal notes
 
 ---
 
@@ -112,11 +133,31 @@ npm run preview
 
 ### Advanced Features
 
+#### Keyboard Shortcuts ⌨️
+
+| Key | Action |
+|-----|--------|
+| `/` | Focus search input |
+| `Esc` | Close panels / Clear selection / Blur input |
+| `?` or `h` | Show help panel |
+| `d` | Show details panel (when node selected) |
+| `f` | Show filters panel |
+| `n` | Show nodes panel |
+| `r` | Reset camera view |
+| `j` | Toggle journey suggestions |
+| `←` `→` `↑` `↓` | Navigate between connected nodes |
+
 #### Find Connections
 1. Click the "Connect" button in the toolbar
 2. Select a starting node
 3. Select an ending node
 4. Watch as the AI finds and highlights a meaningful path between them
+
+#### Export & Share 📤
+- **Download JSON**: Export your entire graph for backup or sharing
+- **Copy to Clipboard**: Quick copy of graph data
+- **Native Share**: Use device share menu (mobile-friendly)
+- **Generate Summary**: Create readable text summaries of your graph
 
 #### Book Grid Mode
 1. Toggle to Grid Mode from the toolbar
@@ -130,6 +171,26 @@ npm run preview
 - Select a theme to load a pre-curated literary universe
 - Great for discovery and education
 
+#### Graph Analytics 📊
+Access comprehensive analytics from the toolbar:
+- **Overview**: Total nodes, connections, density
+- **Node Breakdown**: Distribution by type (books, authors, themes)
+- **Connectivity**: Clusters, isolated nodes, average degree
+- **Most Connected**: Top nodes by connection count
+- **Temporal Analysis**: Books per decade, time span
+- **Content Quality**: Images and descriptions coverage
+- **Export**: Download analytics as CSV
+
+#### Performance Monitoring ⚡
+Real-time performance dashboard with:
+- **FPS Tracking**: Monitor frame rate in real-time
+- **Render Time**: Track visualization performance
+- **Memory Usage**: Monitor browser memory consumption
+- **Graph Metrics**: Node/edge count and update times
+- **API Performance**: Track API call success rate and response times
+- **Performance Grade**: Overall system health score with recommendations
+- **Compact Mode**: Minimized view that expands on demand
+
 ---
 
 ## 🏗️ Architecture
@@ -138,7 +199,7 @@ npm run preview
 
 **Frontend Framework**
 - React 19.1.0 with hooks-based architecture
-- TypeScript/JavaScript hybrid
+- TypeScript 5.8.2 (100% migration complete)
 
 **3D Graphics**
 - Three.js 0.176.0 for 3D rendering
@@ -159,6 +220,8 @@ npm run preview
 - Vite 6.2 for blazing-fast builds
 - ESM-based architecture
 - Hot module replacement (HMR)
+- Vitest for unit testing (38 tests)
+- TypeScript type checking
 
 ### Project Structure
 
@@ -168,20 +231,42 @@ new-lit-engine/
 │   ├── initial-graph.json
 │   ├── journey-*.json      # Pre-curated literary journeys
 │   └── meta.json
-├── src/
-│   ├── App.jsx            # Main application component
-│   ├── GraphViz.jsx       # 3D graph visualization
-│   ├── BookGridViz.jsx    # Book grid recommendation wall
-│   ├── LiteraryNode.jsx   # Individual node renderer
-│   ├── SidePanel.jsx      # Details panel
-│   ├── TopLeftToolbar.jsx # Main toolbar
-│   ├── Intro.jsx          # Loading screen
-│   ├── store.js           # Zustand state management
-│   ├── actions.js         # State actions and business logic
-│   ├── llm.js             # AI model integration
-│   ├── libraryApi.js      # Open Library API client
-│   ├── prompts.js         # AI prompt engineering
-│   └── index.css          # Global styles
+├── components/             # Reusable components
+│   ├── GraphLoadingSkeleton.tsx
+│   ├── BookGridSkeleton.tsx
+│   ├── SettingsPanel.tsx
+│   ├── AnalyticsPanel.tsx
+│   ├── PerformanceDashboard.tsx
+│   ├── AdvancedFiltersPanel.tsx
+│   ├── AdvancedSearchPanel.tsx
+│   └── ReadingProgressPanel.tsx
+├── hooks/                  # Custom React hooks
+│   └── useKeyboardShortcuts.ts
+├── utils/                  # Utility functions
+│   ├── export.ts          # Export & share utilities
+│   ├── cache.ts           # Caching layer
+│   ├── rateLimiter.ts     # API rate limiting
+│   ├── validation.ts      # Input validation
+│   ├── advancedFilters.ts # Multi-criteria filtering
+│   ├── analytics.ts       # Graph analytics & statistics
+│   ├── performance.ts     # Performance monitoring
+│   ├── clustering.ts      # Graph clustering algorithms
+│   └── readingProgress.ts # Reading progress tracking
+├── App.tsx                # Main application component
+├── GraphViz.tsx           # 3D graph visualization
+├── BookGridViz.tsx        # Book grid recommendation wall
+├── LiteraryNode.tsx       # Individual node renderer
+├── SidePanel.tsx          # Details panel
+├── TopLeftToolbar.tsx     # Main toolbar
+├── Intro.tsx              # Loading screen
+├── ErrorBoundary.tsx      # Error handling
+├── store.ts               # Zustand state management
+├── actions.ts             # State actions and business logic
+├── llm.ts                 # AI model integration
+├── libraryApi.ts          # Open Library API client
+├── prompts.ts             # AI prompt engineering
+├── types.ts               # TypeScript type definitions
+└── index.css              # Global styles
 ├── vite.config.ts         # Vite configuration
 ├── tsconfig.json          # TypeScript configuration
 └── package.json           # Dependencies and scripts
@@ -278,9 +363,9 @@ In `GraphViz.jsx`, tune the force-directed layout parameters:
 
 ### Known Limitations
 
-- **Large Graphs**: Performance may degrade beyond 200+ nodes (consider filtering)
-- **Mobile Support**: Touch controls work but experience is optimized for desktop
+- **Large Graphs**: Performance may degrade beyond 200+ nodes (use filtering and search)
 - **API Quotas**: Gemini has rate limits; heavy use may require paid tier
+- **3D on Older Devices**: Requires WebGL 2.0 support
 
 ---
 
@@ -311,20 +396,56 @@ In `GraphViz.jsx`, tune the force-directed layout parameters:
 
 ## 🗺️ Roadmap
 
-### Current Phase: MVP & Polish ✅
+### Phase 1: MVP & Core Features ✅
 - [x] Core 3D graph visualization
 - [x] AI-powered search and expansion
 - [x] Open Library integration
 - [x] Journey mode
 - [x] Book grid recommendations
 
-### Next Phase: Stability & Enhancement 🚧
-- [ ] Comprehensive error handling
-- [ ] Loading states and skeletons
-- [ ] TypeScript migration (complete)
-- [ ] Unit and E2E testing
-- [ ] Performance monitoring
-- [ ] Mobile responsiveness improvements
+### Phase 2: TypeScript & Testing ✅
+- [x] Complete TypeScript migration (100% coverage)
+- [x] Unit testing with Vitest (38 tests)
+- [x] Type-safe API integrations
+- [x] Error boundary implementation
+
+### Phase 3: UX Polish ✅
+- [x] Keyboard shortcuts for all major actions
+- [x] Node search with real-time filtering
+- [x] Export & share functionality (JSON, clipboard, native share)
+- [x] Loading skeletons for graph and book grid
+- [x] Comprehensive mobile responsiveness
+- [x] Touch-optimized interface
+
+### Phase 4: Advanced Features & Documentation ✅
+- [x] Data persistence (localStorage with auto-save)
+- [x] Import graphs from JSON files
+- [x] User preferences/settings panel
+- [x] Storage management and monitoring
+- [x] Comprehensive architecture documentation
+
+### Phase 5: Analytics, Performance & Accessibility ✅
+- [x] Graph analytics with comprehensive statistics
+- [x] Real-time performance monitoring dashboard
+- [x] Performance grading and recommendations
+- [x] Advanced filtering utilities (multi-criteria support)
+- [x] ARIA labels and screen reader support
+- [x] Keyboard navigation enhancements
+- [x] Export analytics as CSV
+
+### Phase 6: Advanced Search & Progress Tracking ✅
+- [x] Saved filter presets with management UI
+- [x] Advanced filters panel with live preview
+- [x] Graph clustering visualization algorithms
+- [x] Cluster detection (connected components, by series, by type)
+- [x] Advanced search panel with multi-criteria filtering
+- [x] Real-time search results with sort options
+- [x] Reading progress tracking system
+- [x] Book status management (to-read, reading, completed, abandoned)
+- [x] Yearly reading goals with progress tracking
+- [x] Reading streaks calculation
+- [x] Book ratings and personal notes
+- [x] Import/export reading progress
 
 ### Future Features 🔮
 - [ ] User accounts and saved explorations
@@ -361,12 +482,12 @@ Contributions are welcome! This project is in active development.
 
 ### Areas Needing Help
 
-- TypeScript type definitions
-- Test coverage
-- Mobile UX improvements
-- Accessibility enhancements
-- Documentation and tutorials
-- Performance optimization
+- Accessibility enhancements (ARIA labels, screen readers)
+- Additional test coverage (integration and E2E tests)
+- Performance optimization for very large graphs
+- Additional journey themes
+- Documentation and video tutorials
+- Internationalization (i18n)
 
 ---
 
