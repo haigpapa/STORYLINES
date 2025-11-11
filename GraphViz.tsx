@@ -374,6 +374,7 @@ function SceneContent() {
 }
 
 export default function GraphViz() {
+  console.log('[STORYLINES GraphViz] Rendering Canvas');
   return (
     <Canvas
       camera={{position: [0, 0, 50], near: 0.1, far: 1000}}

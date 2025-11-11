@@ -159,7 +159,12 @@ export default function App() {
     }
   };
 
+  useEffect(() => {
+    console.log('[STORYLINES App] didInit:', didInit, 'nodeCount:', Object.keys(nodes).length);
+  }, [didInit, nodes]);
+
   if (!didInit) {
+    console.log('[STORYLINES App] Rendering intro screen');
     return (
         <main>
             <Intro />
@@ -170,6 +175,8 @@ export default function App() {
         </main>
     );
   }
+
+  console.log('[STORYLINES App] Rendering main app, visualizationMode:', visualizationMode);
 
   const isGraphMode = visualizationMode === 'graph';
   const showTimeline = isGraphMode && isTimelineActive;

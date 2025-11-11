@@ -198,25 +198,30 @@ const resetConnectionState = () => {
 
 export const init = async (): Promise<void> => {
     if (get().didInit) return;
-    
+
+    console.log('[STORYLINES] Initializing application...');
     const minDisplayTime = 1500;
     const startTime = Date.now();
     let success = false;
     let errorMsg = null;
 
-    set(state => { 
-        state.loadingMessage = 'Fetching the initial universe...'; 
+    set(state => {
+        state.loadingMessage = 'Fetching the initial universe...';
         state.visualizationMode = 'graph';
     });
-    
+
     try {
+        console.log('[STORYLINES] Fetching initial-graph.json...');
         const response = await fetch('/initial-graph.json');
+        console.log('[STORYLINES] Fetch response:', response.status, response.statusText);
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const initialData = await response.json();
+        console.log('[STORYLINES] Graph data loaded:', Object.keys(initialData));
         await addNewDataToGraph(initialData, 0, undefined, { skipEnrichment: true });
+        console.log('[STORYLINES] Graph data added successfully');
         success = true;
     } catch (error) {
-        console.error("Failed to load initial graph data:", error);
+        console.error("[STORYLINES] Failed to load initial graph data:", error);
         errorMsg = "Could not load the initial literary universe.";
     }
 
@@ -232,6 +237,8 @@ export const init = async (): Promise<void> => {
         state.loadingMessage = '';
         state.loadingProgress = 0;
     });
+
+    console.log('[STORYLINES] Initialization complete. didInit:', true, 'success:', success);
 
     setTimeout(() => {
         if (get().activePanel === 'help') setActivePanel(null);
