@@ -355,52 +355,47 @@ export const clearQuery = (): void => {
 export const startJourney = async (journeyName: string): Promise<void> => {
     resetConnectionState();
     const journeyFile = journeyName.toLowerCase().replace(/\s/g, '-');
-  
+
     set(state => {
       state.isFetching = true;
       state.nodes = {};
       state.edges = [];
       state.caption = null;
       state.selectedNode = null;
-      state.didInit = false;
+      // DO NOT set didInit to false - keep Canvas mounted to prevent WebGL context loss
       state.latestQueryTimestamp = null;
       state.areJourneySuggestionsVisible = false;
       state.visualizationMode = 'graph';
+      state.loadingMessage = `Loading the "${journeyName}" universe...`;
+      state.loadingProgress = 0;
     });
-  
+
     const minDisplayTime = 1000;
     const startTime = Date.now();
 
     try {
-      set(state => {
-        state.loadingMessage = `Loading the "${journeyName}" universe...`;
-        state.loadingProgress = 0;
-      });
-
       const response = await fetch(`/journey-${journeyFile}.json`);
       if (!response.ok) throw new Error(`Failed to fetch journey data: ${response.statusText}`);
       const journeyData = await response.json();
-      
+
       set(state => { state.loadingProgress = 30; });
-      
+
       await addNewDataToGraph(journeyData, 0, undefined, { skipEnrichment: true });
-      
+
       set(state => { state.loadingProgress = 80; });
 
       const elapsedTime = Date.now() - startTime;
       const remainingTime = minDisplayTime - elapsedTime;
       if (remainingTime > 0) await new Promise(resolve => setTimeout(resolve, remainingTime));
-      
+
       set(state => {
         state.loadingProgress = 100;
-        state.didInit = true;
         state.resetCam = true;
       });
     } catch (error) {
       console.error(`Failed to load journey "${journeyName}":`, error);
       set(state => {
         state.caption = `Could not load the ${journeyName} journey. Please try again.`;
-        init();
       });
     } finally {
       setTimeout(() => {
