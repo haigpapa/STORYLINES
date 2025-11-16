@@ -10,7 +10,7 @@ import type { LLMRequest, LLMResponse } from './types'
 
 // Backend API URL - uses relative path in production, localhost in development
 const API_BASE_URL = import.meta.env.VITE_API_URL ||
-  (import.meta.env.PROD ? '' : 'http://localhost:3001');
+  (import.meta.env.PROD ? '/api' : 'http://localhost:3001/api');
 
 // Helper for retrying promises with exponential backoff
 const sleep = (ms: number): Promise<void> => new Promise(resolve => setTimeout(resolve, ms));
