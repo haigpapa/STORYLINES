@@ -25,20 +25,34 @@ const nodeColors = {
  */
 function parseLlmJson(text: string): any {
     if (!text) throw new Error("LLM response is empty.");
-    // Look for a JSON block inside markdown fences or a raw JSON object.
-    const match = text.match(/```json\s*([\s\S]*?)\s*```|({[\s\S]*})/);
-    if (!match) {
-        // Fallback for cases where the LLM might just return the JSON without fences.
+
+    // Try to find JSON in markdown code fence first
+    const markdownMatch = text.match(/```json\s*([\s\S]*?)\s*```/);
+    if (markdownMatch) {
         try {
-            return JSON.parse(text);
+            return JSON.parse(markdownMatch[1]);
         } catch (e) {
-            console.error("Failed to parse LLM response:", text);
-            throw new Error("No valid JSON found in LLM response.");
+            console.error("Failed to parse JSON from markdown fence:", markdownMatch[1]);
         }
     }
-    // Use the first capturing group that matched (either from the markdown block or the raw object)
-    const jsonString = match[1] || match[2];
-    return JSON.parse(jsonString);
+
+    // Try to extract JSON object
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+        try {
+            return JSON.parse(jsonMatch[0]);
+        } catch (e) {
+            console.error("Failed to parse extracted JSON:", jsonMatch[0]);
+        }
+    }
+
+    // Last resort: try parsing directly
+    try {
+        return JSON.parse(text);
+    } catch (e) {
+        console.error("Failed to parse LLM response:", text);
+        throw new Error("No valid JSON found in LLM response.");
+    }
 }
 
 

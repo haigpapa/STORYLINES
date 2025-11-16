@@ -2,15 +2,10 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
 */
-import { GoogleGenAI } from '@google/genai';
 import { queryLlm, retryWithBackoff } from './llm';
 import { extractThemesPrompt } from './prompts';
 import { apiCache } from './utils/cache';
 import type { Node, OpenLibraryWork, OpenLibraryAuthor, BookData } from './types';
-
-const ai = new GoogleGenAI({
-    apiKey: process.env.API_KEY
-});
 
 // --- API Throttling for Open Library ---
 let lastApiCallTimestamp = 0;

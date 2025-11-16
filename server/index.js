@@ -36,7 +36,7 @@ app.use(helmet({
 // CORS configuration - restrict in production
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production'
-    ? process.env.CLIENT_URL || 'https://your-domain.com'
+    ? (process.env.CLIENT_URL || true) // Allow same-origin in production if CLIENT_URL not set
     : ['http://localhost:3000', 'http://localhost:5173', 'http://localhost:4173'],
   optionsSuccessStatus: 200,
 };
@@ -76,7 +76,7 @@ app.get('/api/health', (req, res) => {
 // Gemini API proxy endpoint - streaming support
 app.post('/api/gemini/generate', geminiLimiter, async (req, res) => {
   try {
-    const { prompt, modelName = 'gemini-2.0-flash-exp', stream = false } = req.body;
+    const { prompt, modelName = 'gemini-1.5-flash', stream = false } = req.body;
 
     if (!prompt) {
       return res.status(400).json({ error: 'Prompt is required' });
@@ -132,7 +132,7 @@ app.post('/api/gemini/generate', geminiLimiter, async (req, res) => {
 // Gemini API proxy endpoint with JSON schema
 app.post('/api/gemini/generate-json', geminiLimiter, async (req, res) => {
   try {
-    const { prompt, schema, modelName = 'gemini-2.0-flash-exp' } = req.body;
+    const { prompt, schema, modelName = 'gemini-1.5-flash' } = req.body;
 
     if (!prompt) {
       return res.status(400).json({ error: 'Prompt is required' });
