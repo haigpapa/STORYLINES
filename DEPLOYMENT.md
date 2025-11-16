@@ -88,12 +88,19 @@ The application consists of:
    - Select your repository
    - Add environment variables in dashboard
 
-4. **Environment Variables** (in Railway dashboard)
+4. **Environment Variables**
+
+   The `railway.toml` file pre-configures:
+   - `NODE_ENV=production`
+   - `PORT=3001`
+
+   **You must set these in Railway dashboard:**
    ```
    GEMINI_API_KEY=your_actual_key
-   NODE_ENV=production
-   PORT=3001
+   CLIENT_URL=https://your-railway-app.railway.app
    ```
+
+   Note: `CLIENT_URL` is optional but recommended for production CORS security.
 
 ---
 

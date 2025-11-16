@@ -9,5 +9,10 @@ healthcheckTimeout = 300
 restartPolicyType = "on-failure"
 restartPolicyMaxRetries = 10
 
+# Environment variables
+[deploy.env]
+NODE_ENV = "production"
+PORT = "3001"
+
 [[services]]
 name = "literary-explorer"
