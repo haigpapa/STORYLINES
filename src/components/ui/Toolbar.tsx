@@ -9,7 +9,7 @@ import {
   X,
 } from 'lucide-react';
 import { useGraphStore } from '../../store/useGraphStore';
-import { storageService } from '../../services/storageService';
+import { dataService } from '../../services/dataService';
 
 export const Toolbar: React.FC = () => {
   const toggleSearch = useGraphStore((state) => state.toggleSearch);
@@ -21,10 +21,10 @@ export const Toolbar: React.FC = () => {
 
   const [showLists, setShowLists] = useState(false);
 
-  const handleExport = async () => {
+  const handleExport = () => {
     try {
-      const data = await storageService.exportData();
-      const blob = new Blob([JSON.stringify(data, null, 2)], {
+      const jsonString = dataService.exportGraph(graph);
+      const blob = new Blob([jsonString], {
         type: 'application/json',
       });
       const url = URL.createObjectURL(blob);
@@ -57,12 +57,18 @@ export const Toolbar: React.FC = () => {
 
       try {
         const text = await file.text();
-        const data = JSON.parse(text);
-        await storageService.importData(data);
+        const importedGraph = dataService.importGraph(text);
 
-        if (data.session) {
-          loadSession(data.session);
-        }
+        // Load the imported graph into the store
+        // We create a "session" object structure to match what loadSession expects
+        // or we could add a direct loadGraph method to the store.
+        // For now, reusing loadSession which clears current state.
+        loadSession({
+          graph: importedGraph,
+          readingList: [],
+          bookmarks: [],
+          viewportTransform: { x: 0, y: 0, k: 1 }
+        });
 
         addJournalEntry({
           type: 'milestone',

@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { GraphCanvas } from './components/graph/GraphCanvas';
 import { SearchPanel } from './components/search/SearchPanel';
 import { NodeInfoPanel } from './components/nodes/NodeInfoPanel';
@@ -6,62 +5,26 @@ import { DevJournal } from './components/journal/DevJournal';
 import { Toolbar } from './components/ui/Toolbar';
 import { Legend } from './components/ui/Legend';
 import { useGraphStore } from './store/useGraphStore';
-import { storageService } from './services/storageService';
-import { geminiService } from './services/geminiService';
 import { Sparkles } from 'lucide-react';
 
+import { useAppInitialization } from './hooks/useAppInitialization';
+import { useGemini } from './hooks/useGemini';
+
 function App() {
-  const [isInitialized, setIsInitialized] = useState(false);
-  const [showApiPrompt, setShowApiPrompt] = useState(false);
-  const [geminiKey, setGeminiKey] = useState('');
-  const addJournalEntry = useGraphStore((state) => state.addJournalEntry);
+  const { isInitialized } = useAppInitialization();
+  const {
+    showApiPrompt,
+    setShowApiPrompt,
+    geminiKey,
+    setGeminiKey,
+    handleSetupGemini,
+    isGeminiInitialized
+  } = useGemini();
+
   const expandNode = useGraphStore((state) => state.expandNode);
-
-  useEffect(() => {
-    const initialize = async () => {
-      // Initialize storage
-      await storageService.initialize();
-
-      // Try to load the last session
-      const session = await storageService.getLatestSession();
-      if (session) {
-        useGraphStore.getState().loadSession(session);
-        addJournalEntry({
-          type: 'milestone',
-          message: 'Loaded previous session',
-        });
-      }
-
-      // Add welcome journal entry
-      addJournalEntry({
-        type: 'milestone',
-        message: 'Welcome to Storylines - AI-Powered Literary Exploration',
-      });
-
-      addJournalEntry({
-        type: 'info',
-        message: 'Search for books, authors, or themes to begin exploring',
-      });
-
-      setIsInitialized(true);
-    };
-
-    initialize();
-  }, []);
 
   const handleNodeDoubleClick = (node: any) => {
     expandNode(node.id);
-  };
-
-  const handleSetupGemini = () => {
-    if (geminiKey.trim()) {
-      geminiService.initialize(geminiKey);
-      setShowApiPrompt(false);
-      addJournalEntry({
-        type: 'technical',
-        message: 'Gemini AI initialized - AI insights enabled',
-      });
-    }
   };
 
   if (!isInitialized) {
@@ -89,7 +52,7 @@ function App() {
             </p>
           </div>
 
-          {!geminiService.isInitialized() && (
+          {!isGeminiInitialized && (
             <button
               onClick={() => setShowApiPrompt(true)}
               className="pointer-events-auto btn-primary flex items-center gap-2"
