@@ -1,14 +1,18 @@
 # Storylines
 
+[![Deploy to GitHub Pages](https://github.com/haigpapa/STORYLINES/actions/workflows/deploy.yml/badge.svg)](https://github.com/haigpapa/STORYLINES/actions/workflows/deploy.yml)
+[![Test and Build](https://github.com/haigpapa/STORYLINES/actions/workflows/test.yml/badge.svg)](https://github.com/haigpapa/STORYLINES/actions/workflows/test.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 **AI-Powered Literary Exploration Platform**
 
 Storylines is a production-grade web application that transforms the way you explore literature through interactive graph visualization, semantic search, and AI-powered contextual enrichment. Discover hidden connections between books, authors, genres, themes, and literary movements in an immersive, visually stunning constellation interface.
 
 ## 🌐 Live Demo
 
-**[View Live Demo](https://haigpapa.github.io/storylines/)** *(Will be live after deployment)*
+**[View Live Demo →](https://haigpapa.github.io/storylines/)**
 
-> **Note:** To deploy, see [DEPLOYMENT.md](DEPLOYMENT.md) for complete instructions.
+> **Automated Deployment:** This project automatically deploys to GitHub Pages on every push to main/master.
 
 ![Storylines Preview](https://via.placeholder.com/1200x600/0f172a/3b82f6?text=Storylines+Interactive+Graph)
 
