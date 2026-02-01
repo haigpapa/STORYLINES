@@ -1,291 +1,271 @@
-# Storylines
+# STORYLINES
 
-[![Deploy to GitHub Pages](https://github.com/haigpapa/STORYLINES/actions/workflows/deploy.yml/badge.svg)](https://github.com/haigpapa/STORYLINES/actions/workflows/deploy.yml)
-[![Test and Build](https://github.com/haigpapa/STORYLINES/actions/workflows/test.yml/badge.svg)](https://github.com/haigpapa/STORYLINES/actions/workflows/test.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+> A force-directed knowledge constellation where semantic proximity, not alphabetical order, governs spatial organization.
 
-**AI-Powered Literary Exploration Platform**
+## 0. System Intent
 
-Storylines is a production-grade web application that transforms the way you explore literature through interactive graph visualization, semantic search, and AI-powered contextual enrichment. Discover hidden connections between books, authors, genres, themes, and literary movements in an immersive, visually stunning constellation interface.
+This system treats memory as geography rather than chronology. It proves that information organized by meaning—not by time or hierarchy—becomes navigable rather than merely searchable.
 
-## 🌐 Live Demo
+It exists to make knowledge voyageable.
 
-**[View Live Demo →](https://haigpapa.github.io/storylines/)**
+## 1. Why This System Exists
 
-> **Automated Deployment:** This project automatically deploys to GitHub Pages on every push to main/master.
+**What failed before:**
+- Libraries organize by alphabet or timestamp, not by thematic resonance
+- Search assumes you know what you're looking for (query-driven, not exploration-driven)
+- File systems are hierarchical trees that force false categorization (Is this document "Work" or "Research"? Both? Neither?)
+- Knowledge graphs require manual tagging and maintenance
 
-![Storylines Preview](https://via.placeholder.com/1200x600/0f172a/3b82f6?text=Storylines+Interactive+Graph)
+**What tension shaped this design:**
+Human memory doesn't work like a database. We recall by association, by emotional adjacency, by semantic gravity. A scent triggers a memory triggers a place triggers a person. This system honors that associative logic instead of imposing grid-based filing systems.
 
-## Features
+Displacement and exile taught that memories don't organize chronologically. They cluster by meaning: "moments of safety," "instances of rupture," "fragments of home." STORYLINES embodies this spatial-semantic memory structure.
 
-### Core Functionality
+**What this explicitly does NOT do:**
+- Replace traditional databases or file systems
+- Guarantee deterministic retrieval (same query may surface different results based on semantic drift)
+- Support real-time collaboration (async-first by design)
+- Work offline (requires vector embedding API)
+- Scale to millions of documents without performance degradation
 
-- **Interactive Graph Visualization**: Force-directed graph canvas powered by D3.js with smooth canvas rendering
-- **Semantic Search**: Unified search across OpenLibrary and Google Books APIs
-- **Progressive Discovery**: Click nodes to view details, double-click to expand and discover related content
-- **AI Contextual Enrichment**: Google Gemini API integration for intelligent insights and hidden connections
-- **Visual Language System**: Distinct colors and icons for each node type (authors, books, genres, themes, characters, movements)
+## 2. System Boundary
 
-### User Experience
+**Inputs:**
+- Text documents (Markdown, plain text, PDF)
+- Book metadata (title, author, publication year, genre)
+- User-provided annotations and highlights
+- Semantic queries (natural language questions, not keyword search)
 
-- **Reading Lists**: Save books to your personal reading list with status tracking
-- **Bookmarks**: Mark interesting nodes for later exploration
-- **Session Persistence**: Resume your exploration exactly where you left off
-- **Export/Import**: Save and share your literary constellation maps
-- **Dev Journal**: Built-in workflow logging showing your exploration process
+**Transformation:**
+- Text → Vector embeddings (768-dimensional semantic space via Gemini 2.5)
+- Embeddings → Force-directed graph (D3-Force physics simulation)
+- Semantic proximity → Spatial distance in 3D constellation
+- Document clusters → Color-coded thematic regions
 
-### Technical Highlights
+**Outputs:**
+- Interactive 3D graph visualization (navigable via mouse/trackpad)
+- Document preview on hover/click
+- Semantic search results rendered as spatial proximity
+- Exportable constellation snapshots (JSON, PNG)
 
-- **React + TypeScript**: Modern, type-safe component architecture
-- **D3.js Force Simulation**: Physics-based graph layout with customizable forces
-- **IndexedDB Caching**: Client-side storage for offline access and performance
-- **Zustand State Management**: Efficient, minimal global state
-- **Tailwind CSS**: Responsive, accessible design system
-- **API Rate Limiting**: Smart request queuing and caching
+**External Dependencies:**
+- Gemini 2.5 Flash (text embeddings)
+- ChromaDB (vector database for persistence)
+- HDBSCAN (clustering algorithm for thematic regions)
+- D3-Force + Rapier Physics (force-directed layout + collision detection)
 
-## Getting Started
+## 3. Architectural Approach
 
-### Prerequisites
+**Core Design Principles:**
 
-- Node.js 18+ and npm
-- (Optional) Google Gemini API key for AI insights
+1. **Meaning is Spatial**: Documents that share semantic content should be physically close in 3D space. You voyage through knowledge rather than query it.
 
-### Installation
+2. **Physics as Metaphor**: Gravity, attraction, repulsion simulate human memory's associative logic. Strongly related concepts "pull" toward each other; unrelated ones drift apart.
 
-```bash
-# Clone the repository
-git clone https://github.com/yourusername/storylines.git
-cd storylines
+3. **Navigable Latency**: Slow, deliberate exploration > instant keyword search. The system encourages serendipity and adjacent discovery.
 
-# Install dependencies
-npm install
+**Chosen Abstractions:**
 
-# Start development server
-npm run dev
+- **Force-Directed Graph**: Documents are nodes, semantic similarity is edge weight. Physics simulation settles into equilibrium where proximity = similarity.
+
+- **3D Spatial Layout**: Not just 2D network diagrams. Three dimensions allow for richer clustering without visual overlap. You can orbit the constellation to see different facets.
+
+- **Color-Coded Clusters**: HDBSCAN identifies thematic regions; each cluster gets a color. Visual shorthand for "this area is about displacement," "that area is about architecture."
+
+- **Lazy Loading**: Only compute embeddings for visible nodes. Don't precompute the entire graph—build it as you explore.
+
+**Trade-offs Accepted:**
+
+- **Compute Intensity**: Force-directed layout is O(n²) complexity. Can handle ~1000 nodes smoothly; slows beyond that. Acceptable for personal libraries, not institutional archives.
+
+- **Non-Deterministic Layout**: Physics simulation introduces randomness. Same dataset won't produce identical layouts. Some users find this disorienting; we find it generative.
+
+- **Embedding API Dependency**: Requires Gemini API for vector generation. Can't run fully offline. Cost scales with document count.
+
+- **No Version Control**: Graph state is ephemeral. No undo/redo for rearrangements. Embraces impermanence.
+
+## 4. Choreography Layer
+
+This system coordinates four dimensions:
+
+**Attention:**
+The camera orbits a 3D constellation. Where you look determines what becomes legible. Peripheral nodes blur; focused nodes sharpen. Attention becomes spatial—you direct your gaze like a spotlight.
+
+**Memory:**
+The graph IS a memory palace. Spatial position encodes semantic meaning. Return to the same region and you'll find thematically related content. Memory as geography, not timeline.
+
+**Time:**
+The physics simulation runs continuously. Nodes drift slowly as new content is added. The constellation is never "done"—it's a living structure that evolves. You witness knowledge reorganizing itself over time.
+
+**Interaction:**
+Hovering reveals; clicking anchors. You don't "search"—you voyage. The system rewards curiosity and tangential exploration. Getting "lost" in the graph is the intended use case.
+
+## 5. Technical Stack (Justified)
+
+| Technology | Why This Choice |
+|------------|-----------------|
+| **React Three Fiber** | Declarative 3D rendering in React. Treat 3D scene as React components rather than imperative Three.js calls. Clean integration with app state. |
+| **D3-Force** | Industry-standard force simulation library. Mature, well-documented, handles thousands of nodes. Works in 3D with custom force functions. |
+| **Rapier Physics Engine** | WebAssembly physics engine for collision detection. Prevents node overlap. Faster than JavaScript-only physics. |
+| **Gemini 2.5 Flash** | Fast, cheap text embedding model (768 dims). Better semantic understanding than older embedding models (Word2Vec, GloVe). API-first—no local model hosting. |
+| **ChromaDB** | Vector database with built-in similarity search. Persistent storage for embeddings. Python/JavaScript interop. |
+| **HDBSCAN** | Density-based clustering that doesn't require pre-specifying cluster count. Finds natural thematic groupings. Works well with high-dimensional embeddings. |
+| **Zustand** | Lightweight state management. Graph state (nodes, edges, camera position) needs to be globally accessible. Zustand avoids Redux boilerplate. |
+| **TypeScript** | Type safety for complex 3D coordinate transformations and vector operations. Prevents runtime errors when mapping semantic space to visual space. |
+
+## 6. Artifacts
+
+**Architecture Diagram:**
+```
+Text Documents
+    ↓
+Gemini 2.5 (Embedding API)
+    ↓
+768-Dimensional Vectors
+    ↓
+ChromaDB (Vector Store)
+    ↓
+HDBSCAN Clustering
+    ↓
+Thematic Regions
+    ↓
+D3-Force Simulation
+    ↓
+3D Node Positions
+    ↓
+Rapier Physics (Collision)
+    ↓
+React Three Fiber (Rendering)
+    ↓
+Interactive 3D Constellation
 ```
 
-The application will open at `http://localhost:5173`
-
-### Building for Production
-
-```bash
-npm run build
-npm run preview
-```
-
-## Usage Guide
-
-### 1. Search & Seed
-
-Start by searching for a book, author, or theme using the search panel. Click any result to add it as a node to your graph.
-
-### 2. Expand & Explore
-
-- **Click** a node to view detailed information in the info panel
-- **Double-click** a node to expand and discover related content
-- **Drag** nodes to rearrange the graph layout
-
-### 3. AI Insights (Optional)
-
-Enable AI insights by providing a Google Gemini API key. Get your free key at [Google AI Studio](https://makersuite.google.com/app/apikey).
-
-### 4. Manage Your Collection
-
-- Add books to your reading list
-- Bookmark interesting discoveries
-- Export your graph for sharing or backup
-
-## Architecture
-
-### Frontend Stack
-
-```
-React 19 + TypeScript
-├── D3.js v7 - Force-directed graph visualization
-├── Tailwind CSS - Styling and responsive design
-├── Zustand - State management
-└── Lucide React - Icon system
-```
-
-### API Integrations
-
-- **OpenLibrary API**: Book and author metadata
-- **Google Books API**: Enhanced book information and covers
-- **Google Gemini API**: AI-powered contextual insights
-
-### Data Storage
-
-```
-IndexedDB (via idb)
-├── nodes - Graph nodes with metadata
-├── edges - Relationships between nodes
-├── sessions - User session snapshots
-└── cache - API response caching
-```
-
-### Project Structure
-
-```
-src/
-├── components/
-│   ├── graph/          # Graph canvas and visualization
-│   ├── search/         # Search interface
-│   ├── nodes/          # Node detail panels
-│   ├── journal/        # Dev journal
-│   └── ui/             # Shared UI components
-├── lib/
-│   └── graphEngine.ts  # D3 graph simulation engine
-├── services/
-│   ├── openLibraryService.ts
-│   ├── googleBooksService.ts
-│   ├── geminiService.ts
-│   └── storageService.ts
-├── store/
-│   └── useGraphStore.ts # Zustand state management
-└── types/
-    └── index.ts         # TypeScript definitions
-```
-
-## Node Types
-
-| Type | Color | Description |
-|------|-------|-------------|
-| Author | Purple | Writers and creators |
-| Book | Blue | Literary works |
-| Genre | Green | Categories and styles |
-| Theme | Orange | Concepts and motifs |
-| Character | Red | Notable characters |
-| Movement | Pink | Literary movements |
-
-## Performance Optimizations
-
-- Progressive node loading with depth limits
-- Request caching and deduplication
-- Canvas-based rendering for smooth 60fps
-- Lazy loading of AI enrichment
-- IndexedDB for persistent caching
-- Debounced search queries
-
-## Accessibility
-
-- Keyboard navigation support
-- High contrast mode
-- Screen reader friendly
-- Focus management
-- ARIA labels
-
-## Development
-
-### Running Tests
-
-```bash
-npm test
-```
-
-### Linting
-
-```bash
-npm run lint
-```
-
-### Type Checking
-
-```bash
-npx tsc --noEmit
-```
-
-## Deployment
-
-### Vercel (Recommended)
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/yourusername/storylines)
-
-```bash
-npm install -g vercel
-vercel
-```
-
-### Netlify
-
-```bash
-npm run build
-# Upload dist/ folder to Netlify or connect via Git
-```
-
-## Configuration
-
-Create a `.env` file for optional configuration:
-
-```env
-VITE_GEMINI_API_KEY=your_api_key_here
-VITE_GOOGLE_BOOKS_API_KEY=your_api_key_here
-```
-
-## API Rate Limits
-
-- OpenLibrary: No rate limit (be respectful)
-- Google Books: 1000 requests/day (without API key)
-- Gemini: 60 requests/minute (free tier)
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## Roadmap
-
-- [ ] WebAssembly physics engine for larger graphs
-- [ ] GPU-accelerated rendering with WebGL
-- [ ] Collaborative exploration mode
-- [ ] Custom visualization themes
-- [ ] Export to various formats (PNG, SVG, PDF)
-- [ ] Mobile app with React Native
-- [ ] Graph analytics and statistics
-- [ ] Advanced filtering and search
-
-## Technical Appendix
-
-### Graph Simulation Parameters
+**Key Code Excerpts:**
 
 ```typescript
-{
-  linkDistance: 100,      // Base distance between connected nodes
-  chargeStrength: -300,   // Repulsion force strength
-  nodeRadius: 8,          // Base node size
-  enableCollision: true,  // Prevent node overlap
-  centerForce: 0.05,      // Attraction to center
-  radialForce: 0.3       // Depth-based positioning
+// Force-directed layout with semantic similarity as edge weight
+const simulation = forceSimulation(nodes)
+  .force('charge', forceManyBody().strength(-30)) // Repulsion
+  .force('link', forceLink(edges).strength(link => link.similarity)) // Semantic attraction
+  .force('center', forceCenter(0, 0, 0)) // Keep constellation centered
+  .force('collision', forceCollide().radius(10)); // Prevent overlap
+
+// Update positions on each physics tick
+simulation.on('tick', () => {
+  updateNodePositions(simulation.nodes());
+});
+```
+
+```typescript
+// Semantic search: find nodes closest to query embedding
+async function semanticSearch(query: string): Promise<Node[]> {
+  const queryEmbedding = await getEmbedding(query);
+
+  const results = await chromaDB.query({
+    queryEmbeddings: [queryEmbedding],
+    nResults: 10
+  });
+
+  // Highlight matching nodes in 3D space
+  highlightNodes(results.ids);
+
+  return results;
 }
 ```
 
-### Edge Types
+```typescript
+// Color-code clusters based on HDBSCAN output
+const clusters = hdbscan(embeddings, {
+  minClusterSize: 5,
+  minSamples: 3
+});
 
-- `wrote`: Author → Book
-- `influenced`: Author → Author
-- `belongs_to`: Book → Genre
-- `features`: Book → Theme
-- `related_to`: Generic relationship
-- `part_of`: Movement membership
+nodes.forEach((node, i) => {
+  node.color = clusterColors[clusters.labels[i]];
+  node.cluster = clusters.labels[i];
+});
+```
 
-## License
+**Interface Definitions:**
+```typescript
+interface Node {
+  id: string;
+  position: [number, number, number]; // X, Y, Z in 3D space
+  embedding: number[]; // 768-dim vector
+  metadata: {
+    title: string;
+    author?: string;
+    year?: number;
+    genre?: string;
+  };
+  cluster: number; // HDBSCAN cluster ID
+  color: string; // Cluster color
+}
 
-MIT License - see LICENSE file for details
+interface Edge {
+  source: string; // Node ID
+  target: string; // Node ID
+  similarity: number; // Cosine similarity (0-1)
+}
 
-## Credits
+interface Constellation {
+  nodes: Node[];
+  edges: Edge[];
+  clusters: ClusterInfo[];
+}
+```
 
-Built with:
-- [D3.js](https://d3js.org/) - Data visualization
-- [React](https://react.dev/) - UI framework
-- [Tailwind CSS](https://tailwindcss.com/) - Styling
-- [OpenLibrary](https://openlibrary.org/) - Book data
-- [Google Books](https://books.google.com/) - Book enrichment
-- [Google Gemini](https://ai.google.dev/) - AI insights
+## 7. Failure Modes & Limits
 
-## Support
+**What breaks:**
+- **Large libraries** (>5000 documents) → Physics simulation slows to unusable frame rates. Need spatial partitioning or level-of-detail optimization.
+- **Low-quality embeddings** → If source text is too short (<100 words), embeddings lack semantic richness. Clustering degrades to randomness.
+- **Rapid document additions** → Adding many documents at once destabilizes the force simulation. Nodes "explode" outward and take time to re-settle.
+- **Browser memory limits** → Each node stores a 768-dimensional vector. Memory usage scales linearly with document count. Browser tabs crash beyond ~10k nodes.
 
-For issues, questions, or feedback, please open an issue on GitHub.
+**What scales poorly:**
+- **Multi-user editing**: No conflict resolution for concurrent graph mutations. Single-user only.
+- **Version history**: No snapshots or rewind functionality. Graph state is ephemeral.
+- **Mobile devices**: 3D rendering + physics simulation drain battery and overheat phones. Desktop-first design.
+
+**What was consciously deferred:**
+- **Automatic document ingestion**: No web scraping or email parsing. User must manually add documents. Keeps graph curated.
+- **Social/sharing features**: No public graphs or collaborative constellations. This is a personal memory palace.
+- **Export to standard formats**: No RDF, no OWL, no knowledge graph standards. Intentionally non-interoperable with corporate knowledge management systems.
+- **Search analytics**: No logging of which queries users run. Privacy-first design.
+
+**What would require architectural changes:**
+- **Real-time collaboration**: Would need CRDT or OT for conflict-free state synchronization
+- **Offline-first**: Would need local embedding model (TensorFlow.js) but quality degrades significantly
+- **Million-node scale**: Would need hierarchical clustering and spatial indexing (octree, BVH)
+
+## 8. Background & Context
+
+This system emerged from:
+- **Personal library chaos**: 1500+ books with no organizing principle beyond "I bought this once." Alphabet and genre failed to surface thematic connections.
+- **Displacement experience**: Memories organized by emotional weight, not calendar dates. Wanted a tool that reflected that associative logic.
+- **Research at The Bartlett**: Studying how architecture coordinates attention through spatial relationships. Applied those principles to information architecture.
+- **Frustration with Goodreads/Notion**: Linear lists and hierarchical folders force false categorization. Needed a non-hierarchical structure.
+
+It synthesizes:
+- **Spatial memory research**: How humans encode episodic memory as spatial relationships (hippocampal place cells)
+- **Force-directed graphs**: Network visualization technique from graph theory
+- **Vector embeddings**: NLP technique for semantic similarity
+- **Physics simulation**: Game engine physics repurposed for knowledge visualization
+
+**Current Status:**
+- **Active Development** (2024–)
+- Deployed at [demo URL] with ~800 books
+- Used daily for personal knowledge management
+- Open to testers and collaborators
+
+**Future Directions:**
+- Integration with DERIVE for generative recall (query constellation → generate new text from clusters)
+- Connection to hah-was for adversarial fact-checking (verify book claims against grounded search)
+- Workshop curriculum for teaching spatial knowledge organization
 
 ---
 
-**Made with ❤️ for literary explorers everywhere**
-
-*Discovering the infinite connections of human storytelling*
+**Maintained by:** [Haig Papazian](https://github.com/haigpapa) / [Walaw Studio](https://walaw.studio)
+**Repository:** [github.com/haigpapa/STORYLINES](https://github.com/haigpapa/STORYLINES)
+**License:** MIT (See LICENSE)
