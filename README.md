@@ -266,6 +266,22 @@ It synthesizes:
 
 ---
 
+## Meaning Stack Navigator
+
+This repository represents the **Latent Space Layer** of the **Meaning Stack**. Coordinate your navigation through the ecosystem here:
+
+| Layer | System | Intent |
+| :--- | :--- | :--- |
+| **Sensorium** | [3D-Beat-Synth](https://github.com/haigpapa/3D-Beat-Synth) | Body as Input |
+| **Latent Space** | [STORYLINES](https://github.com/haigpapa/STORYLINES) | Memory as Space |
+| **Conductor** | [DERIVE](https://github.com/haigpapa/DERIVE) | Logic & Tuning |
+| **Stage** | [photon+](https://github.com/haigpapa/photon) | Output & Performance |
+| **Veracity Shield** | [hah-was](https://github.com/haigpapa/HAH-WAS) | Epistemic Defense |
+
+**Operating System**: [ECHO (hmp00)](https://github.com/haigpapa/hmp00) | **Methodology**: [Choreography of Systems](https://github.com/haigpapa/choreography-of-systems)
+
+---
+
 **Maintained by:** [Haig Papazian](https://github.com/haigpapa) / [Walaw Studio](https://walaw.studio)
 **Repository:** [github.com/haigpapa/STORYLINES](https://github.com/haigpapa/STORYLINES)
 **License:** MIT (See LICENSE)
